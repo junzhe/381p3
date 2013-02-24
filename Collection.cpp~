@@ -7,27 +7,28 @@ using namespace std;
 
 Collection::Collection(std::ifstream& is,const vector<Record*>& library){
   int total_members = 0;
-  string name_tmp;
-  if (!(is >> name_tmp))
+  if (!(is >> name))
     throw Error("Invalid data found in file!");
-  name = name_tmp;
   if (!(is >> total_members))
     throw Error("Invalid data found in file!");
+  while (is.get() != '\n');
   for (int i = 0; i < total_members; i++) {
-    while (is.get() != '\n');
+
     string title;
     read_title_file(title, is);
     Record record(title);
-    auto it = lower_bound(library.begin(), library.end(), &record, Record_compare_title());
-    if (it == library.end())
+    Record_compare_title comparator;
+    auto it = lower_bound(library.begin(), library.end(), &record, comparator);
+    if (it == library.end()||comparator(&record,*it))
       throw Error("Invalid data found in file!");
     add_member(*it);
   }
 }
 
 void Collection::add_member(Record* record_ptr) {
-  auto it = lower_bound(list.begin(), list.end(), &record, Record_compare_title());
-  if(it!=list.end()){
+  Record_compare_title comparator;
+  auto it = lower_bound(list.begin(), list.end(), record_ptr, comparator);
+  if(it!=list.end()&&!comparator(record_ptr,*it)){
     throw Error("Record is already a member in the collection!");
   }
   list.insert(it,record_ptr);
@@ -35,13 +36,15 @@ void Collection::add_member(Record* record_ptr) {
 }
 
 bool Collection::is_member_present(Record* record_ptr) const{
-  auto it = lower_bound(list.begin(), list.end(), record_ptr, Record_compare_title());
-  return it != list.end();
+  Record_compare_title comparator;
+  auto it = lower_bound(list.begin(), list.end(), record_ptr, comparator);
+  return it != list.end()&&!comparator(record_ptr,*it);
 }
 
 void Collection::remove_member(Record* record_ptr) {
-  auto it = lower_bound(list.begin(), list.end(), record_ptr, Record_compare_title());
-  if (it == list.end())
+  Record_compare_title comparator;
+  auto it = lower_bound(list.begin(), list.end(), record_ptr, comparator);
+  if (it == list.end()||comparator(record_ptr,*it))
     throw Error("Record is not a member in the collection!");
   list.erase(it);
   return;

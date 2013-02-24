@@ -163,8 +163,9 @@ Record* read_id_find_record(){
 
 Record* find_record_by_title(const string& title){
   Record probe_record(title);
-  auto it = lower_bound(library_title.begin(),library_title.end(),&probe_record, Record_compare_title());
-  if(it==library_title.end()){
+  Record_compare_title comparator;
+  auto it = lower_bound(library_title.begin(),library_title.end(),&probe_record, comparator);
+  if(it==library_title.end()||comparator(&probe_record,*it)){
     throw Error("No record with that title!");
   }
   return *it;
@@ -172,8 +173,9 @@ Record* find_record_by_title(const string& title){
 
 Record* find_record_by_id(const int id){
   Record probe_record(id);
-  auto it = lower_bound(library_id.begin(),library_id.end(),&probe_record, Record_compare_id());
-  if(it==library_id.end()){
+  Record_compare_id comparator;
+  auto it = lower_bound(library_id.begin(),library_id.end(),&probe_record, comparator);
+  if(it==library_id.end()||comparator(&probe_record,*it)){
     throw Error("No record with that ID!");
   }
   return *it;
@@ -292,7 +294,7 @@ void input_add_member(){
 
 void input_delete_record(){
   Record * record = read_title_find_record();
-  if (find_if(catalog.begin(), catalog.end(), bind(record_is_member,_1, record)())==catalog.end())
+  if (find_if(catalog.begin(), catalog.end(), bind(record_is_member,_1, record))!=catalog.end())
     throw Error("Cannot delete a record that is a member of a collection!");
   cout << "Record " << record->get_ID() << " " << record->get_title() << " deleted" << endl;
   delete_record(record);
@@ -406,8 +408,7 @@ void input_restore_All(){
     if (!(input >> num_collections))
       throw Error("Invalid data found in file!");
     for (int i = 0; i < num_collections; i++) {
-      Collection collection_tmp(input, library_title);
-      Collection* collection = new Collection(collection_tmp);
+      Collection* collection = new Collection(input,library_title);
       add_collection(collection);
     }
     input.close();

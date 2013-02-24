@@ -1,8 +1,8 @@
 CC = g++
 LD = g++
 
-CFLAGS = -c -pedantic -std=c++11 -Wall -fno-elide-constructors
-LFLAGS = -pedantic -Wall
+CFLAGS = -c -g -pedantic -std=c++11 -Wall -fno-elide-constructors
+LFLAGS = -pedantic -Wall -g
 
 OBJS = p2_main.o Record.o Collection.o Utility.o
 PROG = p2exe
