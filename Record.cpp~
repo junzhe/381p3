@@ -4,6 +4,18 @@
 #include "Utility.h"
 
 using namespace std;
+struct Record_compare_id{
+  bool operator()(const Record* record1_ptr, const Record* record2_ptr)const{
+    return record1_ptr->get_ID() < record2_ptr->get_ID();
+  }
+};
+
+struct Record_compare_title{
+  bool operator()(const Record* record1_ptr, const Record* record2_ptr)const{
+    return record1_ptr->get_Title().compare(ecord2_ptr->get_Title())<0;
+  }
+};
+
 int Record::ID_counter = 0;
 int Record::ID_counter_save = 0;
 

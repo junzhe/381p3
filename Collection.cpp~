@@ -26,7 +26,7 @@ Collection::Collection(std::ifstream& is,const vector<Record*>& library){
 }
 
 void Collection::add_member(Record* record_ptr) {
-  auto it = lower_bound(list.begin(), list.end(), record_ptr, Record_compare_title());
+  auto it = lower_bound(list.begin(), list.end(), &record, Record_compare_title());
   if(it!=list.end()){
     throw Error("Record is already a member in the collection!");
   }

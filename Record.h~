@@ -42,7 +42,7 @@ public:
 	// Accessors
 	int get_ID() const
 	{return ID;}
-	std::string get_title() const
+	String get_title() const
 	{return title;}
 	// reset the ID counter
 	static void reset_ID_counter() 

@@ -9,7 +9,7 @@ void trim_string(string & str) {
   if (str.size() == 0){
     return;
   }
-  unsigned int i = 0;
+  unsigned i = 0;
   while (isspace(str[i])){
     i++;
   }

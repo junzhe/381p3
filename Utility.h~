@@ -23,11 +23,11 @@ void swapem(T & a, T & b) {
     return;
 }
 //Read title from stdin, throw Error if fail
-void read_title_stdin(std::string & title);
+void read_title_stdin(string & title);
 //Read title from file, throw Error if fail
-void read_title_file(std::string & title, std::istream & is);
+void read_title_file(string & title, std::istream & is);
 //Read integer from stdin, throw Error if fail
 void read_integer(int& id, std::istream & is);
 //Trim String for whitespaces
-void trim_string(std::string & str);
+void trim_string(string & str);
 #endif
