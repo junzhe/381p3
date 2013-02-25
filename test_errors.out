@@ -1,0 +1,62 @@
+
+Enter command: Unrecognized command!
+
+Enter command: Could not read an integer value!
+
+Enter command: No record with that ID!
+
+Enter command: No record with that title!
+
+Enter command: Could not read a title!
+
+Enter command: Record 1 added
+
+Enter command: No record with that title!
+
+Enter command: No collection with that name!
+
+Enter command: Collection warmovies added
+
+Enter command: Catalog already has a collection with this name!
+
+Enter command: No record with that ID!
+
+Enter command: No record with that ID!
+
+Enter command: Record is not a member in the collection!
+
+Enter command: No record with that title!
+
+Enter command: All records deleted
+
+Enter command: Could not open file!
+
+Enter command: Could not open file!
+
+Enter command: Memory allocations:
+Records: 0
+Collections: 1
+
+Enter command: Library is empty
+
+Enter command: Catalog contains 1 collections:
+Collection warmovies contains: None
+
+Enter command: Invalid data found in file!
+
+Enter command: Memory allocations:
+Records: 0
+Collections: 1
+
+Enter command: Library is empty
+
+Enter command: Catalog contains 1 collections:
+Collection warmovies contains: None
+
+Enter command: Record 1 added
+
+Enter command: Library contains 1 records:
+1: DVD u Harry Potter and the Goblet of Fire
+
+Enter command: All data deleted
+Done

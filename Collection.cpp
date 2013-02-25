@@ -11,8 +11,8 @@ Collection::Collection(std::ifstream& is,const vector<Record*>& library){
     throw Error("Invalid data found in file!");
   if (!(is >> total_members))
     throw Error("Invalid data found in file!");
-  while (is.get() != '\n');
   for (int i = 0; i < total_members; i++) {
+     while (is.get() != '\n');
     string title;
     read_title_file(title, is);
     Record record(title);

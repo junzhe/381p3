@@ -45,7 +45,7 @@ void read_title_stdin(string & title) {
   try{
     read_title_file(title,cin);
   }catch(Error& error){
-    if(strcmp(error.msg, "Invalid data found in file!")==0){
+    if(strcmp(error.msg, "Invalid data found in file!")==0){     
       throw Error("Could not read a title!");
     }
   }
@@ -57,5 +57,6 @@ void read_title_file(string & title, std::istream & is) {
     if (!getline(is, title) || title == "")
         throw Error("Invalid data found in file!");
     trim_string(title);
+    is.putback('\n');
     return;
 }

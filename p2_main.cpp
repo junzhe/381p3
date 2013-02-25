@@ -103,7 +103,9 @@ void input_quit();
 void error_handler(const char * const err_msg) {
     cout << err_msg << endl;
     cin.clear();
-    while ((char)cin.get() != '\n');
+    if(strcmp(err_msg, "Could not read a title!")!=0){
+      while ((char)cin.get() != '\n');
+    }
     return;
 }
 
@@ -474,7 +476,7 @@ int main() {
     while (true) {
         printf("\nEnter command: ");
         while (isspace(input1 = (char)cin.get()));
-        while (isspace(input2= (char)cin.get()));\
+        while (isspace(input2= (char)cin.get()));
 	string input_command;
 	input_command+=input1;
 	input_command+=input2;
