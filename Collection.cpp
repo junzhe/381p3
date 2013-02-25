@@ -55,6 +55,12 @@ void Collection::save(std::ostream& os) const{
     os << record->get_title() << endl;
 }
 
+void Collection::combine(Collection* collection1_ptr, Collection* collection2_ptr){
+  list.assign(collection1_ptr->list.size()+collection2_ptr->list.size(), nullptr);
+  auto it = set_union(collection1_ptr->list.begin(), collection1_ptr->list.end(), collection2_ptr->list.begin(), collection2_ptr->list.end(), list.begin(), Record_compare_title());
+  list.resize(it-list.begin());
+}
+
 std::ostream& operator<< (std::ostream& os, const Collection& Collection){
   os << "Collection " << Collection.name << " contains:";
   if (Collection.list.empty())

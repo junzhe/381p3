@@ -44,6 +44,8 @@ public:
 	{return ID;}
 	std::string get_title() const
 	{return title;}
+	void set_title(std::string& title_)
+	{title = title_;}
 	// reset the ID counter
 	static void reset_ID_counter() 
 	{ID_counter = 0;}
@@ -55,6 +57,8 @@ public:
 	{ID_counter = ID_counter_save;}
 	// if the rating is not between 1 and 5 inclusive, an exception is thrown
 	void set_rating(int rating_);
+	int get_rating() const
+	{return rating;}
 	
 	// Write a Record's data to a stream in save format with final endl.
 	// The record number is saved.

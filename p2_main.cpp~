@@ -16,6 +16,12 @@ using namespace std::placeholders;
 
 typedef void (*input_func)();
 
+struct Record_compare_rating{
+  bool operator()(const Record* record1_ptr, const Record* record2_ptr)const{
+    return record1_ptr->get_rating()<record2_ptr->get_rating();
+  }
+};
+
 //global variables for libraries and catalog, count
 vector<Record *> library_title;
 vector<Record *> library_id;
@@ -101,6 +107,8 @@ void input_restore_All();
 //Function for quit and destroy all
 void input_quit();
 void input_find_record_by_string();
+void input_list_rating();
+void input_collection_statics();
 
 void error_handler(const char * const err_msg) {
     cout << err_msg << endl;
@@ -198,9 +206,11 @@ Collection* read_name_find_collection(){
 
 Collection* find_collection_by_name(string& name){
   Collection probe_collection(name);
-  auto it = lower_bound(catalog.begin(), catalog.end(), &probe_collection, Collection_compare_name());
-  if (it == catalog.end())
+  Collection_compare_name comparator;
+  auto it = lower_bound(catalog.begin(), catalog.end(), &probe_collection, comparator);
+  if (it == catalog.end()||comparator(&probe_collection,*it)){
     throw Error("No collection with that name!");
+  }
   return (* it);
 }
 
@@ -337,7 +347,7 @@ void library_clear_helper(){
   if (find_if(catalog.begin(), catalog.end(), collection_not_empty)!=catalog.end())
     throw Error("Cannot clear all records unless all collections are empty!");
   for (Record * record: library_id)
-    delete record;
+    //delete record;
   library_id.clear();
   library_title.clear();
   record_count = 0;
@@ -455,14 +465,103 @@ void input_find_record_by_string(){
   for(Record* record:library_title){
      string title_tmp = record->get_title();
      transform(title_tmp.begin(), title_tmp.end(),title_tmp.begin(),::tolower);
-     if(title_tmp.find(key)!=title_tmp.end()){
+     if(title_tmp.find(key)!=string::npos){
        found = true;
        cout<< *record;
      }
    }
    if(!found){
-     throw Error("No records contain the string!");
+     throw Error("No records contain that string!");
    }
+}
+
+void input_list_rating(){
+  if(library_id.empty()){
+    cout << "Library is empty" << endl;
+  }
+  vector<Record*> library_rating = library_title;
+  auto compare_func = [](Record* p1, Record* p2){return p1->get_rating()>p2->get_rating();};
+  sort(library_rating.begin(), library_rating.end(),compare_func);
+  for(Record* record:library_rating){
+    cout<< *record;
+  }
+  return;
+}
+
+void input_collection_statics(){
+  map<Record*, int, Record_compare_id> record_map;
+  int total_records = library_id.size();
+  int more_than_one = 0;
+  for(Record* record: library_id){
+    for(Collection* collection: catalog){
+      if(collection->is_member_present(record)){
+	record_map[record]++;
+      }
+    }
+  }
+  int contained_record_size = record_map.size();
+  cout<<contained_record_size<<" out of "<<total_records<<" Records appear in at least one Collection"<<endl;
+  for(Record* record:library_id){
+    if(record_map[record]>1){
+      more_than_one++;
+    }
+  }
+  cout<<more_than_one<<" out of "<<total_records<<" Records appear in at more than one Collection"<<endl;
+  cout<<"Collections contain a total of "<<contained_record_size<<" Records"<<endl;
+}
+
+void input_combine_collection(){
+  string name1;
+  string name2;
+  string name_combined;
+  cin>>name1;
+  cin>>name2;
+  cin>>name_combined;
+  Collection* collection1_ptr = find_collection_by_name(name1);
+  Collection* collection2_ptr = find_collection_by_name(name2);
+  try{
+    find_collection_by_name(name_combined);
+  }catch(Error& error){
+    Collection* collection_combined = new Collection(name_combined);
+    collection_combined->combine(collection1_ptr, collection2_ptr);
+    cout<<"Collections "<<name1<<" and "<<name2<<" combined into new collection "<<name_combined<<endl;
+    return;
+  }
+  throw Error("Catalog already has a collection with this name!");
+}
+
+void input_modify_title(){
+  int id = 0;
+  string title;
+  read_integer(id, cin);
+  Record probe_record_id(id);
+  Record_compare_id comparator_id;
+  auto it_id = lower_bound(library_id.begin(),library_id.end(),&probe_record_id, comparator_id);
+  if(it_id==library_id.end()||comparator_id(&probe_record_id,*it_id)){
+    throw Error("No record with that ID!");
+  }
+  string prev_title = (*it_id)->get_title();
+  read_title_stdin(title);
+  Record probe_record_title(title);
+  Record_compare_title comparator_title;
+  auto it_title = lower_bound(library_title.begin(),library_title.end(),&probe_record_title, comparator_title);
+  if(it_title!=library_title.end()&&!comparator_title(&probe_record_title,*it_title)){
+    throw Error("Library already has a record with this title!");
+  }
+  Record probe_record_prev_title(prev_title);
+  auto it_prev_title = lower_bound(library_title.begin(),library_title.end(),&probe_record_prev_title, comparator_title);
+  Record* record_new = (*it_id);
+  library_title.erase(it_prev_title);
+  record_new->set_title(title);
+  for(Collection* collection:catalog){
+    if(collection->is_member_present(&probe_record_prev_title)){
+      collection->remove_member(&probe_record_prev_title);
+      collection->add_member(record_new);
+    }
+  }
+  add_record(record_new);
+  cout<<"Title for record "<<id<<" changed to "<<title<<endl;
+  return;
 }
 
 int main() {
@@ -492,6 +591,10 @@ int main() {
     func_map["cA"] = input_clear_All;
     func_map["sA"] = input_save_All;
     func_map["rA"] = input_restore_All;
+    func_map["lr"] = input_list_rating;
+    func_map["cs"] = input_collection_statics;
+    func_map["cc"] = input_combine_collection;
+    func_map["mt"] = input_modify_title;
     func_map["qq"] = input_quit;
     
     while (true) {

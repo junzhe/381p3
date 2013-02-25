@@ -43,6 +43,8 @@ public:
   void clear()
   {list.clear();}
   
+  void combine(Collection* collection1_ptr, Collection* collection2_ptr);
+  
   // Write a Collections's data to a stream in save format, with endl as specified.
   
   // This operator defines the order relation between Collections, based just on the name
