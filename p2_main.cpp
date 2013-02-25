@@ -9,6 +9,7 @@
 #include "Collection.h"
 #include <exception>
 #include <functional>
+#include <ctype.h>
 #include <map>
 using namespace std;
 using namespace std::placeholders;
@@ -99,6 +100,7 @@ void input_save_All();
 void input_restore_All();
 //Function for quit and destroy all
 void input_quit();
+void input_find_record_by_string();
 
 void error_handler(const char * const err_msg) {
     cout << err_msg << endl;
@@ -445,6 +447,24 @@ void input_quit(){
   exit(0);
 }
 
+void input_find_record_by_string(){
+  string key;
+  bool found = false;
+  cin>>key;
+  transform(key.begin(), key.end(),key.begin(),::tolower);
+  for(Record* record:library_title){
+     string title_tmp = record->get_title();
+     transform(title_tmp.begin(), title_tmp.end(),title_tmp.begin(),::tolower);
+     if(title_tmp.find(key)!=string::npos){
+       found = true;
+       cout<< *record;
+     }
+   }
+   if(!found){
+     throw Error("No records contain the string!");
+   }
+}
+
 int main() {
     
     char input1 = 0;
@@ -454,6 +474,7 @@ int main() {
     collection_count = 0;
     map<string, input_func> func_map;
     func_map["fr"] = input_find_record_by_title;
+    func_map["fs"] = input_find_record_by_string;
     func_map["pr"] = input_print_record;
     func_map["pc"] = input_print_collection;
     func_map["pL"] = input_print_Library;
