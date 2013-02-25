@@ -44,6 +44,7 @@ public:
   {list.clear();}
   
   void combine(Collection* collection1_ptr, Collection* collection2_ptr);
+  void collection_sort();
   
   // Write a Collections's data to a stream in save format, with endl as specified.
   

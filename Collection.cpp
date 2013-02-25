@@ -61,6 +61,10 @@ void Collection::combine(Collection* collection1_ptr, Collection* collection2_pt
   list.resize(it-list.begin());
 }
 
+void Collection::collection_sort(){
+  sort(list.begin(), list.end(), Record_compare_title());
+}
+
 std::ostream& operator<< (std::ostream& os, const Collection& Collection){
   os << "Collection " << Collection.name << " contains:";
   if (Collection.list.empty())

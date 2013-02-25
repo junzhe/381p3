@@ -26,7 +26,6 @@ Collection::Collection(std::ifstream& is,const vector<Record*>& library){
 
 void Collection::add_member(Record* record_ptr) {
   Record_compare_title comparator;
-  sort(list.begin(), list.end(), comparator);
   auto it = lower_bound(list.begin(), list.end(), record_ptr, comparator);
   if(it!=list.end()&&!comparator(record_ptr,*it)){
     throw Error("Record is already a member in the collection!");
@@ -37,14 +36,12 @@ void Collection::add_member(Record* record_ptr) {
 
 bool Collection::is_member_present(Record* record_ptr) const{
   Record_compare_title comparator;
-  sort(list.begin(), list.end(), comparator);
   auto it = lower_bound(list.begin(), list.end(), record_ptr, comparator);
   return it != list.end()&&!comparator(record_ptr,*it);
 }
 
 void Collection::remove_member(Record* record_ptr) {
   Record_compare_title comparator;
-  sort(list.begin(), list.end(), comparator);
   auto it = lower_bound(list.begin(), list.end(), record_ptr, comparator);
   if (it == list.end()||comparator(record_ptr,*it))
     throw Error("Record is not a member in the collection!");
@@ -53,18 +50,19 @@ void Collection::remove_member(Record* record_ptr) {
 }
 
 void Collection::save(std::ostream& os) const{
-  sort(list.begin(), list.end(), Record_compare_title);
   os << name << " " << list.size() << endl;
   for (Record * record: list)
     os << record->get_title() << endl;
 }
 
 void Collection::combine(Collection* collection1_ptr, Collection* collection2_ptr){
-  sort(collection1_ptr->list.begin(), collection1_ptr->list.end(), comparator);
-  sort(collection2_ptr->list.begin(), collection2_ptr->list.end(), comparator);
   list.assign(collection1_ptr->list.size()+collection2_ptr->list.size(), nullptr);
   auto it = set_union(collection1_ptr->list.begin(), collection1_ptr->list.end(), collection2_ptr->list.begin(), collection2_ptr->list.end(), list.begin(), Record_compare_title());
   list.resize(it-list.begin());
+}
+
+void Collection::sort(){
+  sort(list.begin(), list.end(), Record_compare_title());
 }
 
 std::ostream& operator<< (std::ostream& os, const Collection& Collection){

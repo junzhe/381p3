@@ -94,8 +94,8 @@ Enter command: Library contains 5 records:
 1: DVD 1 Theobald - King of Scotland and Wales
 3: VHS 3 Zorba the Greek
 
-Enter command: 5 out of 6 Records appear in at least one Collection
-2 out of 6 Records appear in at more than one Collection
+Enter command: 5 out of 5 Records appear in at least one Collection
+0 out of 5 Records appear in at more than one Collection
 Collections contain a total of 5 Records
 
 Enter command: Title for record 1 changed to Are you kidding?
@@ -117,8 +117,8 @@ Enter command: 4: VHS 3 The War of the Worlds
 
 Enter command: Catalog contains 2 collections:
 Collection Junk contains:
-2: DVD 1 John Swales contributions to obscure Poetry
 1: DVD 1 Are you kidding?
+2: DVD 1 John Swales contributions to obscure Poetry
 Collection literature contains:
 5: DVD 1 Shakespeare's Much Ado about Nothing
 4: VHS 3 The War of the Worlds
@@ -130,19 +130,25 @@ Enter command: Catalog already has a collection with this name!
 
 Enter command: Collections Junk and literature combined into new collection garbage
 
-Enter command: Catalog contains 3 collections:
+Enter command: Catalog contains 4 collections:
 Collection Junk contains:
-2: DVD 1 John Swales contributions to obscure Poetry
 1: DVD 1 Are you kidding?
+2: DVD 1 John Swales contributions to obscure Poetry
+Collection garbage contains:
+1: DVD 1 Are you kidding?
+2: DVD 1 John Swales contributions to obscure Poetry
+5: DVD 1 Shakespeare's Much Ado about Nothing
+4: VHS 3 The War of the Worlds
+3: VHS 3 Zorba the Greek
 Collection literature contains:
 5: DVD 1 Shakespeare's Much Ado about Nothing
 4: VHS 3 The War of the Worlds
 3: VHS 3 Zorba the Greek
 Collection trash contains: None
 
-Enter command: 3 out of 7 Records appear in at least one Collection
-2 out of 7 Records appear in at more than one Collection
-Collections contain a total of 3 Records
+Enter command: 5 out of 5 Records appear in at least one Collection
+5 out of 5 Records appear in at more than one Collection
+Collections contain a total of 10 Records
 
 Enter command: All data deleted
 Done

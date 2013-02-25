@@ -346,8 +346,8 @@ void input_clear_Library(){
 void library_clear_helper(){
   if (find_if(catalog.begin(), catalog.end(), collection_not_empty)!=catalog.end())
     throw Error("Cannot clear all records unless all collections are empty!");
-  //for (Record * record: library_id)
-    //delete record;
+  for (Record * record: library_id)
+    delete record;
   library_id.clear();
   library_title.clear();
   record_count = 0;
@@ -499,15 +499,19 @@ void input_collection_statics(){
       }
     }
   }
-  int contained_record_size = record_map.size();
-  cout<<contained_record_size<<" out of "<<total_records<<" Records appear in at least one Collection"<<endl;
+  int contained_record_type = record_map.size();
+  int contained_record_num = 0;
+  cout<<contained_record_type<<" out of "<<total_records<<" Records appear in at least one Collection"<<endl;
   for(Record* record:library_id){
-    if(record_map[record]>1){
-      more_than_one++;
+    if(record_map.find(record)!=record_map.end()){
+      contained_record_num+=record_map[record];
+      if(record_map[record]>1){
+	more_than_one++;
+      }
     }
   }
   cout<<more_than_one<<" out of "<<total_records<<" Records appear in at more than one Collection"<<endl;
-  cout<<"Collections contain a total of "<<contained_record_size<<" Records"<<endl;
+  cout<<"Collections contain a total of "<<contained_record_num<<" Records"<<endl;
 }
 
 void input_combine_collection(){
@@ -524,6 +528,7 @@ void input_combine_collection(){
   }catch(Error& error){
     Collection* collection_combined = new Collection(name_combined);
     collection_combined->combine(collection1_ptr, collection2_ptr);
+    add_collection(collection_combined);
     cout<<"Collections "<<name1<<" and "<<name2<<" combined into new collection "<<name_combined<<endl;
     return;
   }
@@ -548,18 +553,22 @@ void input_modify_title(){
   if(it_title!=library_title.end()&&!comparator_title(&probe_record_title,*it_title)){
     throw Error("Library already has a record with this title!");
   }
+  
   Record probe_record_prev_title(prev_title);
-  auto it_prev_title = lower_bound(library_title.begin(),library_title.end(),&probe_record_prev_title, comparator_title);
   Record* record_new = (*it_id);
-  library_title.erase(it_prev_title);
-  record_new->set_title(title);
+  vector<Collection*> cand;
   for(Collection* collection:catalog){
     if(collection->is_member_present(&probe_record_prev_title)){
-      collection->remove_member(&probe_record_prev_title);
-      collection->add_member(record_new);
+      cand.push_back(collection);
     }
   }
-  add_record(record_new);
+  
+  record_new->set_title(title);
+  sort(library_title.begin(), library_title.end(), comparator_title);
+  for(Collection* collection:cand){
+    collection->collection_sort();
+  }
+  
   cout<<"Title for record "<<id<<" changed to "<<title<<endl;
   return;
 }
