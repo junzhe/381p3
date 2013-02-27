@@ -61,7 +61,7 @@ void Collection::combine(Collection* collection1_ptr, Collection* collection2_pt
   list.resize(it-list.begin());
 }
 
-void Collection::sort(){
+void Collection::collection_sort(){
   sort(list.begin(), list.end(), Record_compare_title());
 }
 

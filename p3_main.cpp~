@@ -492,7 +492,7 @@ void input_collection_statics(){
   map<Record*, int, Record_compare_id> record_map;
   int total_records = library_id.size();
   int more_than_one = 0;
-  for_each(library_id.begin(), library_id.end(), [&record_map](Record* record){
+  for_each(library_id.begin(), library_id.end(), [&record_map](Reocrd* record){
     input_collection_statics_helper_one(record_map,record);
   });
   int contained_record_type = record_map.size();
