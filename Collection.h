@@ -4,6 +4,10 @@
 #include <vector>
 #include "Utility.h"
 #include "Record.h"
+using std::string;
+using std::ostream;
+using std::ifstream;
+using std::vector;
 /* Collections contain a name and a container of members,
 represented as pointers to Records.
 Collection objects manage their own Record container. 
@@ -13,7 +17,7 @@ The container of Records is not available to clients.
 class Collection{
 public:
   // Construct a collection with the specified name and no members
- Collection(const std::string& name_)
+ Collection(const string& name_)
    :name(name_),
     list(){}
   /*fill this in*/
@@ -24,10 +28,10 @@ public:
   // No check made for whether the Collection already exists or not.
   // Throw Error exception if invalid data discovered in file.
   // String data input is read directly into the member variable.
-  Collection(std::ifstream& is, const std::vector<Record*>& library);
+  Collection(ifstream& is, const vector<Record*>& library);
   
   // Accessors
-  std::string get_name() const
+  string get_name() const
   {return name;}
   
   // Add the Record, throw exception if there is already a Record with the same title.
@@ -38,12 +42,13 @@ public:
   bool is_member_present(Record* record_ptr) const;
   // Remove the specified Record, throw exception if the record was not found.
   void remove_member(Record* record_ptr);
-  void save(std::ostream& os) const;
+  void save(ostream& os) const;
   // discard all members
   void clear()
   {list.clear();}
-  
+  //union of two collection
   void combine(Collection* collection1_ptr, Collection* collection2_ptr);
+  //sort the list
   void collection_sort();
   
   // Write a Collections's data to a stream in save format, with endl as specified.
@@ -52,15 +57,18 @@ public:
   bool operator< (const Collection& rhs) const
   {return name<rhs.name;}
   
-   friend std::ostream& operator<< (std::ostream& os, const Collection& Collection);
+   friend ostream& operator<< (ostream& os, const Collection& Collection);
+   //Operator<< overload for ostream_iterator
+   friend ostream& operator<< (ostream& os, const Record* record);
 		
  private:
-  std::string name;
-  std::vector<Record*> list;
+  string name;
+  vector<Record*> list;
 };
 
 // Print the Collection data
-std::ostream& operator<< (std::ostream& os, const Collection& Collection);
+ostream& operator<< (ostream& os, const Collection& Collection);
+ostream& operator<< (ostream& os, const Record* record);
 
 struct Collection_compare_name{
   bool operator()(const Collection* collection1_ptr, const Collection* collection2_ptr)const{

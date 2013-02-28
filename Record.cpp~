@@ -3,7 +3,11 @@
 #include <fstream>
 #include "Utility.h"
 
-using namespace std;
+using std::string;
+using std::ostream;
+using std::ifstream;
+using std::endl;
+
 int Record::ID_counter = 0;
 int Record::ID_counter_save = 0;
 
@@ -13,9 +17,7 @@ Record::Record(const string& title_):ID(0), title(title_),medium(),rating(0){}
 
 Record::Record(int ID_):ID(ID_),title(),medium(),rating(0){}
 
-Record::Record(Record& from):ID(from.ID),title(from.title),medium(from.medium),rating(from.rating){}
-
-Record::Record(std::ifstream& is){
+Record::Record(ifstream& is){
   if (!(is >> ID))
     throw Error("Invalid data found in file!");
     if (!(is >> medium))
@@ -34,11 +36,11 @@ void Record::set_rating(int rating_){
   rating = rating_;
 }
 
-void Record::save(std::ostream& os) const{
+void Record::save(ostream& os) const{
   os << ID << " " << medium << " " << rating << " " << title << endl;
 }
 
-std::ostream& operator<<(std::ostream& os, const Record& record){
+ostream& operator<<(ostream& os, const Record& record){
   if (record.rating == 0){
     os << record.ID << ": " << record.medium << " u " << record.title << endl;
   }else{

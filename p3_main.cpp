@@ -11,21 +11,62 @@
 #include <functional>
 #include <ctype.h>
 #include <map>
-using namespace std;
+
 using namespace std::placeholders;
+using std::map;
+using std::vector;
+using std::iostream;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::ofstream;
+using std::ifstream;
+using std::exception;
 
 typedef void (*input_func)();
+typedef map<Record*, int, Record_compare_id> map_record_id;
+typedef vector<Record *> vector_record;
+typedef vector<Collection *> vector_collection;
 
+//function object for algorithm
 struct Record_compare_rating{
   bool operator()(const Record* record1_ptr, const Record* record2_ptr)const{
     return record1_ptr->get_rating()<record2_ptr->get_rating();
   }
 };
 
+//function object for collection statics
+class Input_collection_statics_obj{
+public:
+  void operator()(Record* record){
+    if(record_map.find(record)!=record_map.end()){
+	this->contained_record_num+=record_map[record];
+      if(record_map[record]>1){
+	this->contained_record_more_than_one++;
+      }
+    }
+  }
+  Input_collection_statics_obj(map_record_id& record_map_){
+    contained_record_num = 0;
+    contained_record_more_than_one = 0;
+    record_map = record_map_;
+  }
+  int get_contained_record_num(){
+    return contained_record_num;
+  }
+  int get_contained_record_more_than_one(){
+    return contained_record_more_than_one;
+  }
+private:
+  map_record_id record_map;
+  int contained_record_num;
+  int contained_record_more_than_one;
+};
+
 //global variables for libraries and catalog, count
 vector<Record *> library_title;
 vector<Record *> library_id;
-vector<Collection*> catalog;
+vector_collection catalog;
 int record_count;
 int collection_count;
 
@@ -106,9 +147,14 @@ void input_save_All();
 void input_restore_All();
 //Function for quit and destroy all
 void input_quit();
+//Function for find record by string
 void input_find_record_by_string();
+//Function for list rating
 void input_list_rating();
+//Function for collection statics
 void input_collection_statics();
+//Helper function for collection statics
+void input_collection_statics_helper_one(map_record_id& record_map, Record* record);
 
 void error_handler(const char * const err_msg) {
     cout << err_msg << endl;
@@ -398,9 +444,9 @@ void input_restore_All(){
   if (!input){
     throw Error("Could not open file!");
   }
-  vector<Record *> library_title_sub(library_title);
-  vector<Record *> library_id_sub(library_id);
-  vector<Collection*> catalog_sub(catalog);
+  vector_record library_title_sub(library_title);
+  vector_record library_id_sub(library_id);
+  vector_collection catalog_sub(catalog);
   Record::save_ID_counter();
   catalog.clear();
   library_title.clear();
@@ -477,43 +523,42 @@ void input_list_rating(){
   if(library_id.empty()){
     cout << "Library is empty" << endl;
   }
-  vector<Record*> library_rating = library_title;
+  vector_record library_rating = library_title;
   auto compare_func = [](Record* p1, Record* p2){return p1->get_rating()>p2->get_rating();};
   sort(library_rating.begin(), library_rating.end(),compare_func);
   for_each(library_rating.begin(), library_rating.end(), [](Record* record){cout<<*record;});
   return;
 }
 
-void input_collection_statics_helper_one(map<Record*, int, Record_compare_id>& record_map, Record* record){
+void input_collection_statics_helper_one(map_record_id& record_map, Record* record){
   for_each(catalog.begin(),catalog.end(),[&record,&record_map](Collection* collection){if(collection->is_member_present(record)){ record_map[record]++;}});
 }
 
 void input_collection_statics(){
-  map<Record*, int, Record_compare_id> record_map;
+  //map to keep track count of record
+  map_record_id record_map;
   int total_records = library_id.size();
-  int more_than_one = 0;
+  
   for_each(library_id.begin(), library_id.end(), [&record_map](Record* record){
+    //count total numbers of records in members
     input_collection_statics_helper_one(record_map,record);
   });
+  
   int contained_record_type = record_map.size();
-  int contained_record_num = 0;
   cout<<contained_record_type<<" out of "<<total_records<<" Records appear in at least one Collection"<<endl;
-  for_each(library_id.begin(), library_id.end(), [&record_map, &contained_record_num, &more_than_one](Record* record){
-    if(record_map.find(record)!=record_map.end()){
-      contained_record_num+=record_map[record];
-      if(record_map[record]>1){
-	more_than_one++;
-      }
-    }
-  });
-  cout<<more_than_one<<" out of "<<total_records<<" Records appear in at more than one Collection"<<endl;
-  cout<<"Collections contain a total of "<<contained_record_num<<" Records"<<endl;
+  
+  //Use object functor to count the number
+  Input_collection_statics_obj functor = for_each(library_id.begin(), library_id.end(),Input_collection_statics_obj (record_map));
+  cout<<functor.get_contained_record_more_than_one()<<" out of "<<total_records<<" Records appear in at more than one Collection"<<endl;
+  cout<<"Collections contain a total of "<<functor.get_contained_record_num()<<" Records"<<endl;
 }
 
 void input_combine_collection(){
   string name1;
   string name2;
   string name_combined;
+  
+  //read in two names
   cin>>name1;
   cin>>name2;
   cin>>name_combined;
@@ -532,6 +577,7 @@ void input_combine_collection(){
 }
 
 void input_modify_title(){
+  
   int id = 0;
   string title;
   read_integer(id, cin);
@@ -550,15 +596,17 @@ void input_modify_title(){
     throw Error("Library already has a record with this title!");
   }
   
+  //Collections which has member record
   Record probe_record_prev_title(prev_title);
   Record* record_new = (*it_id);
-  vector<Collection*> cand;
+  vector_collection cand;
   for_each(catalog.begin(), catalog.end(), [&probe_record_prev_title,&cand](Collection* collection){
     if(collection->is_member_present(&probe_record_prev_title)){
       cand.push_back(collection);
     }
   });
   
+  //Resort container to keep correct order
   record_new->set_title(title);
   sort(library_title.begin(), library_title.end(), comparator_title);
   for_each(cand.begin(), cand.end(), [](Collection* collection){collection->collection_sort();});
@@ -575,6 +623,8 @@ int main() {
     record_count = 0;
     collection_count = 0;
     map<string, input_func> func_map;
+    
+    //set the input to function
     func_map["fr"] = input_find_record_by_title;
     func_map["fs"] = input_find_record_by_string;
     func_map["pr"] = input_print_record;
@@ -608,7 +658,6 @@ int main() {
 	input_command+=input1;
 	input_command+=input2;
         
-	
         try {
           if(func_map.find(input_command)==func_map.end()){
 	    throw Error("Unrecognized command!");

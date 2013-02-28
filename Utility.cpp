@@ -3,35 +3,44 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <algorithm>
 using namespace std;
 
 void trim_string(string & str) {
   if (str.size() == 0){
     return;
   }
-  unsigned int i = 0;
-  while (isspace(str[i])){
-    i++;
-  }
-  if (i > 0){
-    str.erase(0, i);
-  }
-  i = 1;
-  int space_start = 0;
-  while (i < str.size()) {
-    if (isspace(str[i]) && !isspace(str[i - 1]))
-      space_start = i;
-    if (!isspace(str[i]) && isspace(str[i - 1]) && i - space_start >= 2) {
-      str.erase(space_start, i - space_start - 1);
-      str[space_start] = ' ';
-      i = space_start;
+  
+  int start = 0, len = 0, i = 0;
+  bool inword = false;
+  vector<string> words;
+  
+  //Lambda function for get all word in a title
+  for_each(str.begin(),str.end(), [&start,&len,&inword,&words,&str,&i](char elem){
+    if(isspace(elem)&&inword){
+      inword = false;
+      words.push_back(str.substr(start,len));
+    }else if(!isspace(elem)&&!inword){
+      inword =true;
+      start = i;
+      len = 1;
+    }else if(!isspace(elem)&&inword){
+      len++;
     }
     i++;
+  });
+  
+  if(inword){
+    words.push_back(str.substr(start,len));
   }
   
-  if (isspace(str[str.size() - 1])){
-    str.erase(space_start, str.size() - space_start);
+  str = "";
+  
+  //only range for for concatane words together
+  for(string word:words){
+    str+=word+" ";
   }
+  str.erase(str.size()-1,1);
   return;
 }
 
